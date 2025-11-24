@@ -114,6 +114,7 @@ class GestionUsuarios:
         return True
     
     def editar_usuario(self, cedula):
+        cedula = input("Ingrese la cedula del usuario a editar: ")
         for u in self.usuarios:
             if u.cedula == cedula:
                 print("Deje en blanco para no cambiar el dato")
@@ -236,7 +237,7 @@ def menu_principal():
     
     # Menu principal despues de iniciar sesion
     while True:
-        print("\x1b[;34m"+"\n=== MENU PRINCIPAL - SISTEMA DE GESTION DROGUERIA ===")
+        print("\x1b[;35m"+"____ MENU PRINCIPAL - SISTEMA DE GESTION DROGUERIA ____")
         print("1. Gestion de Usuarios")
         print("2. Gestion de Clientes")
         print("3. Cerrar sesion y salir")
@@ -266,8 +267,7 @@ def menu_usuarios(gestion):
         if opcion == "1":
             gestion.registrar_usuario()
         elif opcion == "2":
-            cedula = input("Ingrese la cedula del usuario a editar: ")
-            gestion.editar_usuario(cedula)
+            gestion.editar_usuario()
         elif opcion == "3":
             cedula = input("Ingrese la cedula del usuario a eliminar: ")
             gestion.eliminar_usuario(cedula)
