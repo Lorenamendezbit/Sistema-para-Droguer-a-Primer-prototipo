@@ -1,11 +1,13 @@
+# cedula "2521" y contraseña "admin123"
 class Usuario:
-    def __init__(self, nombre, cedula, telefono):
+    def __init__(self, nombre, cedula, telefono, password):
         self.nombre = nombre
         self.cedula = cedula
         self.telefono = telefono
+        self.password = password
     
     def __str__(self):
-        return f"{self.nombre} - {self.cedula} - {self.telefono}"
+        return f"{self.nombre} | {self.cedula} | {self.telefono}"
 
 class Cliente:
     def __init__(self, nombre, documento, telefono):
@@ -14,7 +16,81 @@ class Cliente:
         self.telefono = telefono
     
     def __str__(self):
-        return f"{self.nombre} - {self.documento} - {self.telefono}"
+        return f"{self.nombre} | {self.documento} | {self.telefono}"
+
+class SistemaLogin:
+    def __init__(self):
+        self.usuario_actual = None
+        self.es_admin = False
+        self.usuarios_sistema = {}
+        # Admin por defecto
+        self.usuarios_sistema["2521"] = {"password": "admin123", "tipo": "admin"}
+    
+    def registrar_usuario_sistema(self):
+        print("°=°=°=° REGISTRO DE USUARIO DEL SISTEMA °=°=°=°")
+
+        nombre = input("Ingrese su nombre: ")
+        while True:
+            cedula = input("Ingrese la cedula: ")
+            if cedula.isdigit() == False:
+               print("\033[;31m"+"La cedula debe ser un numero valido.")
+            else:
+               break
+        
+        if cedula in self.usuarios_sistema:
+            print("Ya existe un usuario registrado con esa cedula.")
+            return False
+        
+        while True:
+            telefono = input("\033[;34m"+"Ingrese numero de celular: ")
+            if telefono.isdigit() == False:
+               print("\033[;31m"+"Debe ser un numero valido POR FAVOR >:(")
+            else:
+               break
+
+        password = input("Establezca su contraseña: ")
+
+        while True:
+            confirmar = input("\033[;34m"+"Confirme su contraseña: ")
+            if password != confirmar:
+                print("Las contraseñas no coinciden.")
+            else:
+               break
+        
+        
+        self.usuarios_sistema[cedula] = {"nombre":nombre, "Telefono": telefono,"password": password, "tipo": "usuario"}
+        print("Usuario registrado correctamente en el sistema.")
+        print(Usuario(nombre, cedula,telefono, password))
+        return True
+    
+    def iniciar_sesion(self):
+        print("=== INICIO DE SESION ===")
+        cedula = input("Cedula: ")
+        password = input("Contraseña: ")
+        
+        if cedula in self.usuarios_sistema and self.usuarios_sistema[cedula]["password"] == password:
+            self.usuario_actual = cedula
+            self.es_admin = self.usuarios_sistema[cedula]["tipo"] == "2521"
+    
+            if self.es_admin:
+                print("\033[;35;47m"+"  Bienvenido Administrador  "+'\033[0;m')
+            else:
+                print(f"\033[;32;47m"+" ♥ Bienvenido Usuario ♥  "+'\033[0;m')
+            return True
+        else:
+            print("Cedula o contraseña incorrectos.")
+            return False
+    
+    def cerrar_sesion(self):
+        if self.usuario_actual:
+            print("Sesion cerrada")
+            self.usuario_actual = None
+            self.es_admin = False
+        else:
+            print("No hay sesion activa.")
+    
+    def esta_autenticado(self):
+        return self.usuario_actual is not None
 
 class GestionUsuarios:
     def __init__(self):
@@ -135,14 +211,35 @@ class GestionClientes:
         print("----------------------------\n")
 
 def menu_principal():
+    sistema_login = SistemaLogin()
     gestion_usuarios = GestionUsuarios()
     gestion_clientes = GestionClientes()
     
+    # Menu inicial
+    while True:
+        print("\x1b[;34m"+"=== BIENVENIDO AL SISTEMA ===")
+        print("1. Registrarse")
+        print("2. Iniciar sesion")
+        print("3. Salir")
+        opcion = input("Seleccione una opcion: ")
+        
+        if opcion == "1":
+            sistema_login.registrar_usuario_sistema()
+        elif opcion == "2":
+            if sistema_login.iniciar_sesion():
+                break
+        elif opcion == "3":
+            print("Saliendo del sistema...")
+            return
+        else:
+            print("Opcion invalida.")
+    
+    # Menu principal despues de iniciar sesion
     while True:
         print("\x1b[;34m"+"\n=== MENU PRINCIPAL - SISTEMA DE GESTION DROGUERIA ===")
         print("1. Gestion de Usuarios")
         print("2. Gestion de Clientes")
-        print("3. Salir")
+        print("3. Cerrar sesion y salir")
         opcion = input("Seleccione una opcion: ")
         
         if opcion == "1":
@@ -150,6 +247,7 @@ def menu_principal():
         elif opcion == "2":
             menu_clientes(gestion_clientes)
         elif opcion == "3":
+            sistema_login.cerrar_sesion()
             print("Saliendo del sistema...")
             break
         else:
