@@ -55,7 +55,7 @@ class Inventario:
         self.cargar_iniciales()
 
     def agregar_anio(self, fecha_ddmm):
-        """Convierte una fecha dd-mm a dd-mm-aaaa aplicando la regla B."""
+        """Convierte una fecha dd-mm a dd-mm-aaaa."""
         dia, mes = map(int, fecha_ddmm.split("-"))
         hoy = datetime.now()
         anio_actual = hoy.year
