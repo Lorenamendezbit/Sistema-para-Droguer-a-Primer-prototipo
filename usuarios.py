@@ -1,89 +1,110 @@
-# cedula "2521" y contraseña "admin123"
+from datetime import datetime
+
+# ========================================
+#           MODULO DE USUARIOS
+# ========================================
+
 class Usuario:
-    def __init__(self, nombre, cedula, telefono, password):
+    def _init_(self, nombre, cedula, telefono, password=None):
         self.nombre = nombre
         self.cedula = cedula
         self.telefono = telefono
         self.password = password
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.nombre} | {self.cedula} | {self.telefono}"
 
+
 class Cliente:
-    def __init__(self, nombre, documento, telefono):
+    def _init_(self, nombre, documento, telefono):
         self.nombre = nombre
         self.documento = documento
         self.telefono = telefono
     
-    def __str__(self):
+    def _str_(self):
         return f"{self.nombre} | {self.documento} | {self.telefono}"
 
+
 class SistemaLogin:
-    def __init__(self):
+    def _init_(self):
         self.usuario_actual = None
         self.es_admin = False
         self.usuarios_sistema = {}
-        # Admin por defecto
-        self.usuarios_sistema["2521"] = {"password": "admin123", "tipo": "admin"}
+        # Admin predeterminado
+        self.usuarios_sistema["2521"] = {
+            "nombre": "Administrador",
+            "Telefono": "0000000000",
+            "password": "admin123", 
+            "tipo": "admin"
+        }
     
     def registrar_usuario_sistema(self):
-        print("°=°=°=° REGISTRO DE USUARIO DEL SISTEMA °=°=°=°")
-
+        print("\n==============================================")
+        print("      REGISTRO DE USUARIO DEL SISTEMA")
+        print("==============================================")
+        
         nombre = input("Ingrese su nombre: ")
+        
         while True:
             cedula = input("Ingrese la cedula: ")
-            if cedula.isdigit() == False:
-               print("\033[;31m"+"La cedula debe ser un numero valido.")
+            if not cedula.isdigit():
+                print("\033[;31mLa cedula debe ser un numero valido\033[0;m")
             else:
-               break
+                break
         
         if cedula in self.usuarios_sistema:
-            print("Ya existe un usuario registrado con esa cedula.")
+            print("\033[;31mYa existe un usuario registrado con esa cedula.\033[0;m")
             return False
         
         while True:
-            telefono = input("\033[;34m"+"Ingrese numero de celular: ")
-            if telefono.isdigit() == False:
-               print("\033[;31m"+"Debe ser un numero valido POR FAVOR >:(")
+            telefono = input("Ingrese numero de celular: ")
+            if not telefono.isdigit():
+                print("\033[;31mDebe ser un numero valido\033[0;m")
             else:
-               break
-
+                break
+        
         password = input("Establezca su contraseña: ")
-
+        
         while True:
-            confirmar = input("\033[;34m"+"Confirme su contraseña: ")
+            confirmar = input("Confirme su contraseña: ")
             if password != confirmar:
-                print("Las contraseñas no coinciden.")
+                print("\033[;31mLas contraseñas no coinciden.\033[0;m")
             else:
-               break
+                break
         
+        self.usuarios_sistema[cedula] = {
+            "nombre": nombre,
+            "Telefono": telefono,
+            "password": password,
+            "tipo": "usuario"
+        }
         
-        self.usuarios_sistema[cedula] = {"nombre":nombre, "Telefono": telefono,"password": password, "tipo": "usuario"}
-        print("Usuario registrado correctamente en el sistema.")
-        print(Usuario(nombre, cedula,telefono, password))
+        print("\033[;32mUsuario registrado correctamente en el sistema.\033[0;m")
         return True
     
     def iniciar_sesion(self):
-        print("=== INICIO DE SESION ===")
+        print("\n==============================================")
+        print("             INICIO DE SESION")
+        print("==============================================")
         cedula = input("Cedula: ")
         password = input("Contraseña: ")
         
         if cedula in self.usuarios_sistema and self.usuarios_sistema[cedula]["password"] == password:
             self.usuario_actual = cedula
-            self.es_admin = self.usuarios_sistema[cedula]["tipo"] == "2521"
-    
+            self.es_admin = self.usuarios_sistema[cedula]["tipo"] == "admin"
+            
             if self.es_admin:
-                print("\033[;35;47m"+"  Bienvenido Administrador  "+'\033[0;m')
+                print("\033[;35;47m  Bienvenido Administrador  \033[0;m")
             else:
-                print(f"\033[;32;47m"+" ♥ Bienvenido Usuario ♥  "+'\033[0;m')
+                print("\033[;32;47m  Bienvenido Usuario  \033[0;m")
             return True
         else:
-            print("Cedula o contraseña incorrectos.")
+            print("\033[;31mCedula o contraseña incorrectos.\033[0;m")
             return False
     
     def cerrar_sesion(self):
         if self.usuario_actual:
-            print("Sesion cerrada")
+            print("\033[;33mSesion cerrada correctamente.\033[0;m")
             self.usuario_actual = None
             self.es_admin = False
         else:
@@ -91,217 +112,141 @@ class SistemaLogin:
     
     def esta_autenticado(self):
         return self.usuario_actual is not None
+    
+    def obtener_nombre_usuario(self):
+        if self.usuario_actual and self.usuario_actual in self.usuarios_sistema:
+            return self.usuarios_sistema[self.usuario_actual].get("nombre", "Usuario")
+        return "Usuario"
+
 
 class GestionUsuarios:
-    def __init__(self):
+    def _init_(self):
         self.usuarios = []
     
     def registrar_usuario(self):
-        print("||       Registro de Usuario      ||")
-        print("------------------------------------")
+        print("\n==============================================")
+        print("         REGISTRO DE USUARIO")
+        print("==============================================")
         nombre = input("Ingrese el nombre del usuario: ")
         cedula = input("Ingrese la cedula: ")
         telefono = input("Ingrese el telefono: ")
         
         for u in self.usuarios:
             if u.cedula == cedula:
-                print("Ya existe un usuario con esa cedula.")
+                print("\033[;31mYa existe un usuario con esa cedula.\033[0;m")
                 return False
         
         nuevo = Usuario(nombre, cedula, telefono)
         self.usuarios.append(nuevo)
-        print("Usuario registrado correctamente.")
+        print("\033[;32mUsuario registrado correctamente.\033[0;m")
         return True
     
-    def editar_usuario(self, cedula):
+    def editar_usuario(self):
         cedula = input("Ingrese la cedula del usuario a editar: ")
         for u in self.usuarios:
             if u.cedula == cedula:
                 print("Deje en blanco para no cambiar el dato")
-                nuevo_nombre = input("Nuevo nombre: ")
-                nuevo_telefono = input("Nuevo telefono: ")
+                nuevo_nombre = input(f"Nuevo nombre [{u.nombre}]: ")
+                nuevo_telefono = input(f"Nuevo telefono [{u.telefono}]: ")
                 
                 if nuevo_nombre:
                     u.nombre = nuevo_nombre
                 if nuevo_telefono:
                     u.telefono = nuevo_telefono
                 
-                print("Usuario actualizado correctamente.")
+                print("\033[;32mUsuario actualizado correctamente.\033[0;m")
                 return True
         
-        print("No se encontro un usuario con esa cedula.")
+        print("\033[;31mNo se encontro un usuario con esa cedula.\033[0;m")
         return False
     
     def eliminar_usuario(self, cedula):
         for u in self.usuarios:
             if u.cedula == cedula:
                 self.usuarios.remove(u)
-                print("Usuario eliminado correctamente.")
+                print("\033[;32mUsuario eliminado correctamente.\033[0;m")
                 return True
         
-        print("No existe usuario con esa cedula.")
+        print("\033[;31mNo existe usuario con esa cedula.\033[0;m")
         return False
     
     def listar_usuarios(self):
         if not self.usuarios:
+            print("\n--- LISTA DE USUARIOS ---")
             print("No hay usuarios registrados.")
+            print("---------------------------")
             return
         
         print("\n--- LISTA DE USUARIOS ---")
         for u in self.usuarios:
             print(u)
-        print("----------------------------\n")
+        print("---------------------------")
+
 
 class GestionClientes:
-    def __init__(self):
+    def _init_(self):
         self.clientes = []
     
     def registrar_cliente(self):
-        print("||       Registro de Cliente      ||")
-        print("------------------------------------")
+        print("\n==============================================")
+        print("         REGISTRO DE CLIENTE")
+        print("==============================================")
         nombre = input("Ingrese el nombre del cliente: ")
         documento = input("Ingrese el numero de documento: ")
         telefono = input("Ingrese el telefono: ")
         
         for c in self.clientes:
             if c.documento == documento:
-                print("Ya existe un cliente con ese documento.")
+                print("\033[;31mYa existe un cliente con ese documento.\033[0;m")
                 return False
         
         nuevo = Cliente(nombre, documento, telefono)
         self.clientes.append(nuevo)
-        print("Cliente registrado correctamente.")
+        print("\033[;32mCliente registrado correctamente.\033[0;m")
         return True
     
     def editar_cliente(self, documento):
         for c in self.clientes:
             if c.documento == documento:
                 print("Deje en blanco para no cambiar el dato")
-                nuevo_nombre = input("Nuevo nombre: ")
-                nuevo_telefono = input("Nuevo telefono: ")
+                nuevo_nombre = input(f"Nuevo nombre [{c.nombre}]: ")
+                nuevo_telefono = input(f"Nuevo telefono [{c.telefono}]: ")
                 
                 if nuevo_nombre:
                     c.nombre = nuevo_nombre
                 if nuevo_telefono:
                     c.telefono = nuevo_telefono
                 
-                print("Cliente actualizado correctamente.")
+                print("\033[;32mCliente actualizado correctamente.\033[0;m")
                 return True
         
-        print("No se encontro un cliente con ese documento.")
+        print("\033[;31mNo se encontro un cliente con ese documento.\033[0;m")
         return False
     
     def eliminar_cliente(self, documento):
         for c in self.clientes:
             if c.documento == documento:
                 self.clientes.remove(c)
-                print("Cliente eliminado correctamente.")
+                print("\033[;32mCliente eliminado correctamente.\033[0;m")
                 return True
         
-        print("No existe cliente con ese documento.")
+        print("\033[;31mNo existe cliente con ese documento.\033[0;m")
         return False
     
     def listar_clientes(self):
         if not self.clientes:
+            print("\n--- LISTA DE CLIENTES ---")
             print("No hay clientes registrados.")
+            print("---------------------------")
             return
         
         print("\n--- LISTA DE CLIENTES ---")
         for c in self.clientes:
             print(c)
-        print("----------------------------\n")
-
-def menu_principal():
-    sistema_login = SistemaLogin()
-    gestion_usuarios = GestionUsuarios()
-    gestion_clientes = GestionClientes()
+        print("---------------------------")
     
-    # Menu inicial
-    while True:
-        print("\x1b[;34m"+"=== BIENVENIDO AL SISTEMA ===")
-        print("1. Registrarse")
-        print("2. Iniciar sesion")
-        print("3. Salir")
-        opcion = input("Seleccione una opcion: ")
-        
-        if opcion == "1":
-            sistema_login.registrar_usuario_sistema()
-        elif opcion == "2":
-            if sistema_login.iniciar_sesion():
-                break
-        elif opcion == "3":
-            print("Saliendo del sistema...")
-            return
-        else:
-            print("Opcion invalida.")
-    
-    # Menu principal despues de iniciar sesion
-    while True:
-        print("\x1b[;35m"+"____ MENU PRINCIPAL - SISTEMA DE GESTION DROGUERIA ____")
-        print("1. Gestion de Usuarios")
-        print("2. Gestion de Clientes")
-        print("3. Cerrar sesion y salir")
-        opcion = input("Seleccione una opcion: ")
-        
-        if opcion == "1":
-            menu_usuarios(gestion_usuarios)
-        elif opcion == "2":
-            menu_clientes(gestion_clientes)
-        elif opcion == "3":
-            sistema_login.cerrar_sesion()
-            print("Saliendo del sistema...")
-            break
-        else:
-            print("Opcion invalida.")
-
-def menu_usuarios(gestion):
-    while True:
-        print("\x1b[;34m"+"=== MENU USUARIOS ===")
-        print("1. Registrar usuario")
-        print("2. Editar usuario")
-        print("3. Eliminar usuario")
-        print("4. Listar usuarios")
-        print("5. Volver al menu principal")
-        opcion = input("Seleccione una opcion: ")
-        
-        if opcion == "1":
-            gestion.registrar_usuario()
-        elif opcion == "2":
-            gestion.editar_usuario()
-        elif opcion == "3":
-            cedula = input("Ingrese la cedula del usuario a eliminar: ")
-            gestion.eliminar_usuario(cedula)
-        elif opcion == "4":
-            gestion.listar_usuarios()
-        elif opcion == "5":
-            break
-        else:
-            print("Opcion invalida.")
-
-def menu_clientes(gestion):
-    while True:
-        print("\x1b[;34m"+"=== MENU CLIENTES ===")
-        print("1. Registrar cliente")
-        print("2. Editar cliente")
-        print("3. Eliminar cliente")
-        print("4. Listar clientes")
-        print("5. Volver al menu principal")
-        opcion = input("Seleccione una opcion: ")
-        
-        if opcion == "1":
-            gestion.registrar_cliente()
-        elif opcion == "2":
-            documento = input("Ingrese el documento del cliente a editar: ")
-            gestion.editar_cliente(documento)
-        elif opcion == "3":
-            documento = input("Ingrese el documento del cliente a eliminar: ")
-            gestion.eliminar_cliente(documento)
-        elif opcion == "4":
-            gestion.listar_clientes()
-        elif opcion == "5":
-            break
-        else:
-            print("Opcion invalida.")
-
-if __name__ == "__main__":
-    menu_principal()
+    def buscar_cliente(self, documento):
+        for c in self.clientes:
+            if c.documento == documento:
+                return c
+        return None
